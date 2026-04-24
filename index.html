@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Twenzetu Tours — Your Kenyan Travel Companion</title>
+  <meta name="description" content="Twenzetu Tours — Kenya's premier safari, beach and adventure travel company."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+  <style>
+    /* =====================================================================
+       DESIGN TOKENS
+    ===================================================================== */
+    :root {
+      --gold:    #F4B942;
+      --gold-dk: #C9901A;
+      --amber:   #D97B12;
+      --dark:    #0C0C0A;
+      --dark-2:  #1A1812;
+      --cream:   #FAF8F2;
+      --cream-2: #F0EDE3;
+      --sage:    #3E5430;
+      --muted:   #8A8070;
+      --lt-muted:#C5BFB0;
+      --fd: 'Cormorant Garamond', Georgia, serif;
+      --fb: 'Mulish', sans-serif;
+      --ease:   cubic-bezier(.4,0,.2,1);
+      --spring: cubic-bezier(.34,1.56,.64,1);
+    }
+
+    /* =====================================================================
+       RESET
+    ===================================================================== */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
+    html  { scroll-behavior:smooth }
+    body  { font-family:var(--fb); background:var(--cream); color:var(--dark);
+            overflow-x:hidden; -webkit-font-smoothing:antialiased;
+            /* FIX: cursor:none only on non-touch via JS class added later */
+          }
+    img   { display:block; max-width:100% }
+    a     { text-decoration:none }
+    ul    { list-style:none }
+
+    /* =====================================================================
+       CUSTOM CURSOR — desktop only (JS adds .has-custom-cursor to body)
+    ===================================================================== */
+    .has-custom-cursor { cursor:none }
+    /* On touch devices, individual elements must keep their default pointer */
+    .has-custom-cursor a,
+    .has-custom-cursor button,
+    .has-custom-cursor .chip,
+    .has-custom-cursor .int-card,
+    .has-custom-cursor .gal-item,
+    .has-custom-cursor .why-card { cursor:none }
+
+    .cur-dot {
+      position:fixed; width:8px; height:8px; background:var(--gold);
+      border-radius:50%; pointer-events:none; z-index:9999;
+      transform:translate(-50%,-50%);
+      transition:width .2s, height .2s, background .2s, opacity .2s;
+      display:none; /* hidden until JS enables */
+    }
+    .cur-ring {
+      position:fixed; width:36px; height:36px;
+      border:2px solid rgba(244,185,66,.55); border-radius:50%;
+      pointer-events:none; z-index:9998; transform:translate(-50%,-50%);
+      transition:width .35s var(--ease), height .35s var(--ease), border-color .35s;
+      display:none;
+    }
+    .has-custom-cursor .cur-dot,
+    .has-custom-cursor .cur-ring { display:block }
+
+    .cur-dot.hov  { width:14px; height:14px; background:var(--amber) }
+    .cur-ring.hov { width:52px; height:52px; border-color:rgba(244,185,66,.3) }
+
+    /* =====================================================================
+       SCROLL PROGRESS BAR
+    ===================================================================== */
+    #progress-bar {
+      position:fixed; top:0; left:0; height:3px; width:0%; z-index:9000;
+      background:linear-gradient(90deg,var(--gold),var(--amber));
+      transition:width .08s linear; pointer-events:none;
+    }
+
+    /* =====================================================================
+       PRELOADER
+    ===================================================================== */
+    #preloader {
+      position:fixed; inset:0; background:var(--dark-2); z-index:10000;
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; gap:2rem;
+      transition:opacity .6s var(--ease), visibility .6s;
+    }
+    #preloader.done { opacity:0; visibility:hidden; pointer-events:none }
+    .pre-logo {
+      font-family:var(--fd); font-size:2.2rem; font-weight:700; color:#fff;
+      letter-spacing:2px; animation:preLogoPulse 1.4s ease infinite alternate;
+    }
+    .pre-logo span { color:var(--gold) }
+    @keyframes preLogoPulse { from{opacity:.35} to{opacity:1} }
+    .pre-track {
+      width:180px; height:2px; background:rgba(255,255,255,.12);
+      border-radius:2px; overflow:hidden;
+    }
+    .pre-fill {
+      height:100%; background:var(--gold); border-radius:2px;
+      animation:preFill 1.8s var(--ease) forwards;
+    }
+    @keyframes preFill { from{width:0} to{width:100%} }
+
+    /* =====================================================================
+       BACK-TO-TOP
+    ===================================================================== */
+    #btt {
+      position:fixed; bottom:2rem; right:2rem; z-index:500;
+      width:46px; height:46px; border-radius:50%; background:var(--gold);
+      border:none; cursor:pointer; display:flex; align-items:center;
+      justify-content:center; color:var(--dark); font-size:.9rem;
+      opacity:0; transform:translateY(16px);
+      transition:opacity .35s, transform .35s, background .25s, box-shadow .25s;
+      box-shadow:0 6px 20px rgba(244,185,66,.4);
+    }
+    #btt.show  { opacity:1; transform:none }
+    #btt:hover { background:var(--gold-dk); box-shadow:0 10px 28px rgba(244,185,66,.55); transform:translateY(-3px) }
+
+    /* =====================================================================
+       SHARED BUTTONS
+    ===================================================================== */
+    .btn-primary {
+      display:inline-block; background:var(--gold); color:var(--dark);
+      padding:.75rem 2.2rem; border-radius:50px; font-family:var(--fb);
+      font-size:.76rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+      border:none; cursor:pointer; position:relative; overflow:hidden;
+      transition:background .3s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .btn-primary::after {
+      content:''; position:absolute; inset:0; background:rgba(255,255,255,.2);
+      transform:translateX(-120%) skewX(-20deg); transition:transform .45s var(--ease);
+    }
+    .btn-primary:hover::after { transform:translateX(120%) skewX(-20deg) }
+    .btn-primary:hover { background:var(--gold-dk); transform:translateY(-3px); box-shadow:0 10px 30px rgba(244,185,66,.45) }
+
+    .btn-ghost {
+      display:inline-block; background:transparent; color:#fff;
+      padding:.75rem 2.2rem; border-radius:50px; font-family:var(--fb);
+      font-size:.76rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+      border:2px solid rgba(255,255,255,.55); cursor:pointer;
+      transition:all .3s var(--ease);
+    }
+    .btn-ghost:hover { background:rgba(255,255,255,.15); border-color:#fff }
+
+    .btn-dark {
+      display:inline-block; background:var(--dark); color:#fff;
+      padding:.75rem 2.2rem; border-radius:50px; font-family:var(--fb);
+      font-size:.76rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+      border:none; cursor:pointer; position:relative; overflow:hidden;
+      transition:background .3s var(--ease), transform .3s, box-shadow .3s;
+    }
+    .btn-dark::after {
+      content:''; position:absolute; inset:0; background:rgba(255,255,255,.1);
+      transform:translateX(-120%) skewX(-20deg); transition:transform .45s var(--ease);
+    }
+    .btn-dark:hover::after { transform:translateX(120%) skewX(-20deg) }
+    .btn-dark:hover { background:#1f1e1a; transform:translateY(-3px); box-shadow:0 10px 28px rgba(12,12,10,.4) }
+
+    /* =====================================================================
+       SECTION HEADER
+    ===================================================================== */
+    .section-head { text-align:center; margin-bottom:3.8rem }
+    .section-head h2 {
+      font-family:var(--fd); font-size:clamp(2rem,4vw,3.2rem); font-weight:700;
+      text-transform:uppercase; letter-spacing:4px; line-height:1.1; color:var(--dark);
+    }
+    .section-head .rule {
+      width:52px; height:3px; background:var(--gold);
+      margin:.9rem auto 1.1rem; border-radius:3px;
+    }
+    .section-head p {
+      color:var(--muted); font-size:.9rem; font-weight:300;
+      line-height:1.85; max-width:480px; margin:0 auto;
+    }
+
+    /* =====================================================================
+       SCROLL REVEAL
+    ===================================================================== */
+    .reveal       { opacity:0; transform:translateY(44px); transition:opacity .75s var(--ease),transform .75s var(--ease) }
+    .reveal-left  { opacity:0; transform:translateX(-50px); transition:opacity .75s var(--ease),transform .75s var(--ease) }
+    .reveal-right { opacity:0; transform:translateX(50px);  transition:opacity .75s var(--ease),transform .75s var(--ease) }
+    .reveal.visible,.reveal-left.visible,.reveal-right.visible { opacity:1; transform:none }
+    .d1{transition-delay:.12s} .d2{transition-delay:.24s}
+    .d3{transition-delay:.36s} .d4{transition-delay:.48s}
+
+    /* =====================================================================
+       NAVBAR
+    ===================================================================== */
+    #navbar {
+      position:fixed; top:0; left:0; right:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1.4rem 4rem;
+      transition:background .4s var(--ease), padding .4s var(--ease), box-shadow .4s var(--ease);
+    }
+    #navbar.scrolled {
+      background:rgba(12,12,10,.96); backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px); padding:.85rem 4rem;
+      box-shadow:0 2px 28px rgba(0,0,0,.35);
+    }
+    .nav-logo {
+      font-family:var(--fd); font-size:1.5rem; font-weight:700;
+      color:#fff; letter-spacing:.5px; white-space:nowrap;
+    }
+    .nav-logo .g { color:var(--gold) }
+    .nav-links { display:flex; gap:2.6rem }
+    .nav-links a {
+      color:rgba(255,255,255,.8); font-size:.72rem; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; transition:color .25s; position:relative;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px;
+      background:var(--gold); transition:width .3s var(--ease);
+    }
+    .nav-links a:hover            { color:#fff }
+    .nav-links a:hover::after     { width:100% }
+    .nav-links a.active           { color:var(--gold) }
+    .nav-links a.active::after    { width:100% }
+
+    .hamburger {
+      display:none; flex-direction:column; gap:5px; cursor:pointer;
+      background:none; border:none; padding:4px; z-index:201;
+    }
+    .hamburger span {
+      display:block; width:26px; height:2px; background:#fff;
+      border-radius:2px; transition:transform .3s, opacity .3s;
+    }
+
+    /* Mobile overlay */
+    .mob-overlay {
+      display:none; position:fixed; inset:0; background:var(--dark-2);
+      z-index:199; flex-direction:column; align-items:center;
+      justify-content:center; gap:2.5rem;
+    }
+    .mob-overlay.open { display:flex }
+    .mob-overlay a {
+      font-family:var(--fd); font-size:2.4rem; font-weight:700;
+      color:rgba(255,255,255,.85); letter-spacing:2px; text-transform:uppercase;
+      transition:color .2s; opacity:0; transform:translateY(20px);
+    }
+    .mob-overlay.open a { animation:mobIn .4s var(--spring) forwards }
+    .mob-overlay.open a:nth-child(1){animation-delay:.05s}
+    .mob-overlay.open a:nth-child(2){animation-delay:.10s}
+    .mob-overlay.open a:nth-child(3){animation-delay:.15s}
+    .mob-overlay.open a:nth-child(4){animation-delay:.20s}
+    .mob-overlay.open a:nth-child(5){animation-delay:.25s}
+    .mob-overlay.open a:nth-child(6){animation-delay:.30s} /* FIX: was missing */
+    @keyframes mobIn { to{opacity:1;transform:none} }
+    .mob-overlay a:hover { color:var(--gold) }
+
+    /* =====================================================================
+       HERO — FIX: background directly on #hero, not a child div
+       This is the most reliable way to display the image.
+       JS will animate backgroundPositionY for parallax.
+    ===================================================================== */
+    #hero {
+      position:relative;
+      height:100vh;
+      min-height:640px;
+      /* FIX: gradient + image on the section itself. Dark green fallback
+         shows if image fails to load. */
+      background-color: #1a3020;
+      background-image:
+        linear-gradient(180deg,
+          rgba(0,0,0,.15) 0%,
+          rgba(8,12,4,.60) 55%,
+          rgba(4,8,2,.92) 100%),
+        url('https://images.unsplash.com/photo-1535941339077-2dd1c7963098?w=1920&q=85');
+      background-size: cover;
+      background-position: center 50%;
+      background-repeat: no-repeat;
+      /* FIX: no overflow:hidden on the hero itself — was clipping parallax */
+      overflow: visible;
+      display:flex; align-items:center; justify-content:center; text-align:center;
+    }
+
+    /* Floating particles */
+    .hero-particles {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1;
+    }
+    .particle {
+      position:absolute; border-radius:50%; background:rgba(244,185,66,.2);
+      animation:floatP var(--dur,12s) var(--del,0s) ease-in-out infinite alternate;
+    }
+    @keyframes floatP {
+      0%   { transform:translate(0,0) scale(1) }
+      100% { transform:translate(var(--tx,20px),var(--ty,-30px)) scale(var(--sc,1.3)) }
+    }
+
+    .hero-body {
+      position:relative; z-index:2; padding:0 2rem; max-width:800px;
+    }
+    .hero-eyebrow {
+      font-size:.7rem; letter-spacing:5px; text-transform:uppercase;
+      color:var(--gold); font-weight:700; margin-bottom:1.2rem;
+      animation:fadeUp .9s .2s both;
+    }
+    .hero-title {
+      font-family:var(--fd); font-size:clamp(3rem,7.5vw,6.2rem); font-weight:800;
+      color:#fff; text-transform:uppercase; letter-spacing:4px; line-height:.95;
+      margin-bottom:1.5rem; animation:fadeUp .9s .38s both;
+    }
+    .hero-title em { font-style:italic; color:var(--gold) }
+    .hero-sub {
+      color:rgba(255,255,255,.72); font-size:.98rem; font-weight:300; line-height:1.85;
+      max-width:520px; margin:0 auto 2.8rem; animation:fadeUp .9s .52s both;
+    }
+    .hero-btns {
+      display:flex; justify-content:center; gap:1.1rem; flex-wrap:wrap;
+      animation:fadeUp .9s .66s both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:none} }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position:absolute; bottom:3.5rem; left:50%; transform:translateX(-50%);
+      z-index:3; display:flex; flex-direction:column; align-items:center; gap:.5rem;
+      color:rgba(255,255,255,.38); font-size:.62rem; letter-spacing:3.5px;
+      text-transform:uppercase; animation:fadeUp 1s 1.1s both;
+    }
+    .scroll-mouse {
+      width:22px; height:35px; border:1px solid rgba(255,255,255,.3);
+      border-radius:12px; position:relative;
+    }
+    .scroll-mouse::after {
+      content:''; position:absolute; top:5px; left:50%; transform:translateX(-50%);
+      width:2px; height:7px; background:rgba(255,255,255,.45); border-radius:2px;
+      animation:scrollBob 1.9s infinite;
+    }
+    @keyframes scrollBob {
+      0%  {transform:translateX(-50%) translateY(0);opacity:1}
+      75% {transform:translateX(-50%) translateY(12px);opacity:0}
+      76% {transform:translateX(-50%) translateY(0);opacity:0}
+      100%{transform:translateX(-50%) translateY(0);opacity:1}
+    }
+
+    /* FIX: hero edge SVG uses position:absolute, overflow:hidden on a wrapper
+       so it clips only the edge element, not the hero background */
+    .hero-edge-wrap {
+      position:absolute; bottom:-1px; left:0; width:100%; z-index:4;
+      line-height:0; overflow:hidden; pointer-events:none;
+    }
+    .hero-edge-wrap svg { display:block; width:100% }
+
+    /* =====================================================================
+       WHY CHOOSE US
+    ===================================================================== */
+    #why { padding:7rem 2rem; background:var(--cream) }
+    .why-grid {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:2rem;
+      max-width:1200px; margin:0 auto;
+    }
+    .why-card {
+      text-align:center; padding:2.5rem 1.8rem; border-radius:16px;
+      background:#fff; border:1px solid rgba(0,0,0,.05);
+      transition:transform .4s var(--spring), box-shadow .4s var(--ease), border-color .3s;
+      cursor:default;
+    }
+    .why-card:hover {
+      transform:translateY(-12px);
+      box-shadow:0 24px 60px rgba(0,0,0,.1);
+      border-color:rgba(244,185,66,.3);
+    }
+    .why-icon {
+      width:68px; height:68px; border-radius:50%;
+      background:linear-gradient(135deg,var(--gold),var(--amber));
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 1.4rem; font-size:1.4rem; color:var(--dark);
+      transition:transform .4s var(--spring), box-shadow .3s;
+    }
+    .why-card:hover .why-icon {
+      transform:rotate(10deg) scale(1.1);
+      box-shadow:0 8px 24px rgba(244,185,66,.45);
+    }
+    .why-card h3 {
+      font-family:var(--fd); font-size:1.2rem; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase; margin-bottom:.7rem;
+    }
+    .why-card p { color:var(--muted); font-size:.82rem; font-weight:300; line-height:1.85 }
+
+    /* =====================================================================
+       EXPLORE INTERESTS
+    ===================================================================== */
+    #interests { padding:7rem 2rem 6rem; background:var(--cream-2) }
+    .chips-bar {
+      display:flex; justify-content:center; gap:.75rem;
+      flex-wrap:wrap; margin-bottom:3.5rem;
+    }
+    .chip {
+      padding:.55rem 1.55rem; border-radius:50px; border:2px solid var(--lt-muted);
+      font-family:var(--fb); font-size:.75rem; font-weight:700; letter-spacing:1.5px;
+      text-transform:uppercase; cursor:pointer; background:transparent; color:var(--muted);
+      transition:all .25s var(--ease);
+    }
+    .chip:hover, .chip.active {
+      border-color:var(--gold); background:var(--gold); color:var(--dark);
+    }
+    .interest-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:2rem;
+      max-width:1080px; margin:0 auto;
+      transition:max-width .4s, grid-template-columns .4s;
+    }
+    .int-card {
+      position:relative; cursor:pointer;
+      transition:transform .45s var(--spring);
+    }
+    .int-card:hover { transform:translateY(-14px) scale(1.025) }
+    .int-card img {
+      width:100%; aspect-ratio:2/3; object-fit:cover;
+      clip-path:polygon(6% 3%,95% 0%,100% 7%,97% 91%,93% 100%,5% 98%,0% 93%,3% 5%);
+      filter:brightness(.82); transition:transform .55s ease, filter .45s ease;
+    }
+    .int-card:hover img { transform:scale(1.07); filter:brightness(1) }
+    .int-card-label {
+      position:absolute; bottom:18%; left:50%; transform:translateX(-50%);
+      color:#fff; font-family:var(--fd); font-size:1.2rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:5px;
+      text-shadow:0 2px 14px rgba(0,0,0,.65); white-space:nowrap; pointer-events:none;
+    }
+    .int-card-label::before {
+      content:''; display:block; width:28px; height:2px;
+      background:var(--gold); margin:0 auto .5rem;
+    }
+
+    /* =====================================================================
+       FEATURED PACKAGES
+    ===================================================================== */
+    #packages { background:#fff; padding:6rem 2rem; position:relative }
+    #packages::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:4px;
+      background:linear-gradient(90deg,var(--gold),var(--amber),var(--sage));
+    }
+    .pkg-list { max-width:1240px; margin:0 auto }
+    .pkg-row {
+      display:flex; align-items:center; min-height:500px; margin-bottom:1rem;
+    }
+    .pkg-row.rev { flex-direction:row-reverse }
+    .pkg-media {
+      flex:0 0 58%; position:relative; min-height:480px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .blob {
+      position:absolute; inset:-12% -6%; width:112%; height:124%;
+      pointer-events:none; z-index:0;
+    }
+    .pkg-photo {
+      position:relative; z-index:1; width:82%; aspect-ratio:4/3; object-fit:cover;
+      clip-path:polygon(3% 4%,97% 1%,100% 6%,98% 93%,94% 100%,4% 98%,0% 93%,2% 5%);
+      box-shadow:0 30px 65px rgba(0,0,0,.24);
+      transition:transform .55s var(--ease);
+    }
+    .pkg-row:hover .pkg-photo { transform:scale(1.04) }
+    .pkg-copy { flex:0 0 42%; padding:2.5rem 4rem }
+    .pkg-row.rev .pkg-copy { padding:2.5rem 3rem 2.5rem 4rem }
+    .pkg-tag {
+      font-size:.66rem; font-weight:700; letter-spacing:3.5px;
+      text-transform:uppercase; color:var(--gold);
+      display:flex; align-items:center; gap:.5rem; margin-bottom:.9rem;
+    }
+    .pkg-tag::before { content:''; width:28px; height:2px; background:var(--gold) }
+    .pkg-title {
+      font-family:var(--fd); font-size:clamp(2rem,3.5vw,2.8rem); font-weight:700;
+      text-transform:uppercase; letter-spacing:2.5px; line-height:1.05;
+      color:var(--dark); margin-bottom:1.2rem;
+    }
+    .pkg-desc {
+      color:var(--muted); font-size:.86rem; font-weight:300;
+      line-height:1.95; margin-bottom:1.1rem;
+    }
+    .pkg-badges {
+      display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:1.2rem;
+    }
+    .pkg-badge {
+      font-size:.72rem; color:var(--muted); font-weight:500;
+      display:flex; align-items:center; gap:.35rem;
+    }
+    .pkg-badge i { color:var(--gold); font-size:.7rem }
+    .pkg-price { font-size:.82rem; font-weight:600; color:var(--dark); margin-bottom:1.8rem }
+    .pkg-price .amt {
+      font-family:var(--fd); font-size:1.25rem; font-weight:700; color:var(--amber);
+    }
+
+    /* =====================================================================
+       STATS STRIP
+    ===================================================================== */
+    #stats { background:var(--dark-2); padding:4.5rem 2rem }
+    .stats-inner {
+      max-width:960px; margin:0 auto;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; text-align:center;
+    }
+    .stat-num {
+      font-family:var(--fd); font-size:clamp(2.5rem,5vw,4rem); font-weight:700;
+      color:var(--gold); line-height:1; margin-bottom:.5rem;
+    }
+    .stat-lbl {
+      font-size:.68rem; text-transform:uppercase; letter-spacing:3px;
+      color:rgba(255,255,255,.45); font-weight:600;
+    }
+
+    /* =====================================================================
+       GALLERY — FIX: clean 3×2 grid, no broken nth-child spans
+    ===================================================================== */
+    #gallery { padding:6rem 2rem; background:var(--cream) }
+    .gallery-grid {
+      display:grid;
+      /* FIX: 3-column layout with item 1 spanning 2 rows, 5 items filling right 2×2 */
+      grid-template-columns: 1.7fr 1fr 1fr;
+      grid-template-rows: 255px 255px;
+      gap:1rem; max-width:1200px; margin:0 auto;
+    }
+    /* FIX: Only item 1 gets a row-span. All others are single cells. */
+    .gal-item:nth-child(1) { grid-row:span 2 }
+    /* items 2-5 fill the remaining 4 cells. item 6 wraps to row 3 */
+    .gal-item:nth-child(6) {
+      /* Span both right columns on row 3 for a wide panoramic item */
+      grid-column: 2 / 4;
+      height:160px;
+    }
+    .gal-item {
+      position:relative; overflow:hidden; border-radius:8px; cursor:pointer;
+    }
+    .gal-item img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .55s var(--ease), filter .4s;
+    }
+    .gal-item:hover img { transform:scale(1.08); filter:brightness(.85) }
+    .gal-overlay {
+      position:absolute; inset:0; background:rgba(12,12,10,.55);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      opacity:0; transition:opacity .35s var(--ease);
+    }
+    .gal-item:hover .gal-overlay { opacity:1 }
+    .gal-overlay i {
+      color:var(--gold); font-size:1.8rem; margin-bottom:.5rem;
+      transform:scale(.6); transition:transform .35s var(--spring);
+    }
+    .gal-item:hover .gal-overlay i { transform:scale(1) }
+    .gal-overlay span {
+      color:#fff; font-size:.7rem; letter-spacing:3px;
+      text-transform:uppercase; font-weight:700;
+    }
+
+    /* =====================================================================
+       TESTIMONIALS — FIX: arrows outside overflow:hidden container
+    ===================================================================== */
+    #testimonials {
+      padding:7rem 2rem; background:var(--dark-2);
+      position:relative; overflow:hidden;
+    }
+    #testimonials::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse 80% 60% at 50% 50%,
+        rgba(244,185,66,.06) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    #testimonials .section-head h2 { color:#fff }
+    #testimonials .section-head p  { color:rgba(255,255,255,.5) }
+
+    /* FIX: outer wrapper is position:relative with NO overflow:hidden
+       so the arrows (absolutely positioned) are visible */
+    .testi-outer {
+      position:relative;
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 80px; /* makes room for arrows */
+    }
+
+    /* FIX: inner carousel container has overflow:hidden (clips slides) */
+    .testi-carousel {
+      overflow:hidden;
+      border-radius:4px;
+    }
+    .testi-track {
+      display:flex;
+      transition:transform .6s cubic-bezier(.45,0,.1,1);
+      will-change:transform;
+    }
+    .testi-slide { flex:0 0 100%; padding:0 4px }
+    .testi-card {
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:20px; padding:3rem 3.5rem; position:relative;
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      transition:border-color .3s;
+    }
+    .testi-card:hover { border-color:rgba(244,185,66,.28) }
+    .testi-quote-mark {
+      position:absolute; top:1.5rem; left:2.8rem;
+      font-family:var(--fd); font-size:6rem; line-height:1;
+      color:var(--gold); opacity:.15; pointer-events:none; font-weight:700;
+    }
+    .testi-stars { display:flex; gap:.25rem; margin-bottom:1.4rem }
+    .testi-stars i { color:var(--gold); font-size:.85rem }
+    .testi-text {
+      font-family:var(--fd); font-size:1.18rem; font-style:italic;
+      color:rgba(255,255,255,.85); line-height:1.8; margin-bottom:2rem; font-weight:500;
+    }
+    .testi-author { display:flex; align-items:center; gap:1.1rem }
+    .testi-avatar {
+      width:54px; height:54px; border-radius:50%; object-fit:cover;
+      border:2px solid var(--gold); flex-shrink:0;
+    }
+    .testi-info h4 {
+      font-family:var(--fb); font-size:.9rem; font-weight:700;
+      color:#fff; margin-bottom:.2rem;
+    }
+    .testi-info p { font-size:.76rem; color:rgba(255,255,255,.45); font-weight:300 }
+    .testi-trip {
+      display:inline-flex; align-items:center; gap:.4rem; margin-top:.4rem;
+      font-size:.65rem; letter-spacing:2px; text-transform:uppercase;
+      color:var(--gold); font-weight:700;
+    }
+    .testi-trip i { font-size:.6rem }
+
+    /* FIX: arrows are positioned in .testi-outer (no overflow:hidden) */
+    .testi-prev, .testi-next {
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:48px; height:48px; border-radius:50%;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.75);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; z-index:10; font-size:.85rem;
+      transition:all .25s var(--ease); backdrop-filter:blur(6px);
+    }
+    .testi-prev { left:0 }
+    .testi-next { right:0 }
+    .testi-prev:hover, .testi-next:hover {
+      border-color:var(--gold); color:var(--gold);
+      background:rgba(244,185,66,.12);
+    }
+
+    /* Dots */
+    .testi-dots {
+      display:flex; justify-content:center; gap:.65rem; margin-top:2.2rem;
+    }
+    .testi-dot {
+      width:8px; height:8px; border-radius:50%;
+      background:rgba(255,255,255,.22); cursor:pointer;
+      transition:background .3s, width .35s var(--ease);
+      border:none; padding:0;
+    }
+    .testi-dot.active { background:var(--gold); width:28px; border-radius:4px }
+
+    /* Autoplay progress bar */
+    .testi-progress-line {
+      width:100%; height:2px; background:rgba(255,255,255,.1);
+      border-radius:2px; margin-top:1.4rem; overflow:hidden;
+    }
+    .testi-progress-fill {
+      height:100%; background:var(--gold); border-radius:2px; width:0%;
+    }
+
+    /* =====================================================================
+       CONTACT
+    ===================================================================== */
+    #contact { padding:7rem 2rem; background:var(--cream) }
+    .contact-wrap {
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start;
+    }
+    .contact-info h3 {
+      font-family:var(--fd); font-size:clamp(1.8rem,3vw,2.4rem); font-weight:700;
+      text-transform:uppercase; letter-spacing:2px; line-height:1.1; margin-bottom:1.2rem;
+    }
+    .contact-info > p {
+      color:var(--muted); font-size:.86rem; font-weight:300;
+      line-height:1.9; margin-bottom:2rem;
+    }
+    .c-info-list { display:flex; flex-direction:column; gap:1.2rem; margin-bottom:2.2rem }
+    .c-info-item { display:flex; align-items:flex-start; gap:1rem }
+    .c-info-icon {
+      width:42px; height:42px; border-radius:50%; background:var(--gold);
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; font-size:.85rem; color:var(--dark);
+    }
+    .c-info-text h5 {
+      font-size:.76rem; font-weight:700; letter-spacing:1.5px;
+      text-transform:uppercase; color:var(--dark); margin-bottom:.2rem;
+    }
+    .c-info-text p { font-size:.82rem; color:var(--muted); font-weight:300 }
+
+    /* Form */
+    .contact-form { display:flex; flex-direction:column; gap:1.2rem }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem }
+    .form-group { display:flex; flex-direction:column; gap:.5rem }
+    .form-group label {
+      font-size:.7rem; font-weight:700; letter-spacing:2px;
+      text-transform:uppercase; color:var(--dark);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding:.85rem 1.1rem; border:1.5px solid rgba(0,0,0,.12);
+      border-radius:8px; font-family:var(--fb); font-size:.84rem;
+      color:var(--dark); background:#fff; outline:none;
+      transition:border-color .25s, box-shadow .25s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color:var(--gold); box-shadow:0 0 0 3px rgba(244,185,66,.12);
+    }
+    .form-group textarea { resize:vertical; min-height:120px }
+    .form-group select {
+      appearance:none; cursor:pointer;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8070' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 1rem center;
+    }
+    .form-success {
+      display:none; padding:1.2rem; background:#f0fdf4;
+      border:1px solid #86efac; border-radius:8px;
+      color:#166534; font-size:.84rem; font-weight:600; text-align:center;
+    }
+    .form-success.show { display:block }
+
+    /* =====================================================================
+       FOOTER
+    ===================================================================== */
+    footer { background:var(--dark); color:rgba(255,255,255,.6); padding:5.5rem 4rem 2.5rem }
+    .foot-grid {
+      display:grid; grid-template-columns:2.2fr 1.6fr 1.6fr 2fr;
+      gap:3rem; max-width:1240px; margin:0 auto 4rem;
+    }
+    .foot-brand .flogo {
+      font-family:var(--fd); font-size:1.55rem; font-weight:700;
+      color:#fff; display:inline-block; margin-bottom:1.2rem;
+    }
+    .foot-brand .flogo .g { color:var(--gold) }
+    .foot-brand p { font-size:.82rem; font-weight:300; line-height:1.9; margin-bottom:.6rem }
+    .foot-brand .tagline {
+      font-family:var(--fd); font-style:italic; font-size:.9rem;
+      color:var(--gold); margin-top:.3rem;
+    }
+    .foot-col h4 {
+      font-family:var(--fd); font-size:.82rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:2.5px; color:#fff;
+      margin-bottom:1.4rem; padding-bottom:.6rem;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .foot-col ul li {
+      font-size:.8rem; font-weight:300; margin-bottom:.7rem;
+      display:flex; align-items:flex-start; gap:.5rem;
+    }
+    .foot-col ul li i { color:var(--gold); font-size:.68rem; margin-top:.2rem; flex-shrink:0 }
+    .foot-col ul li a { color:rgba(255,255,255,.55); transition:color .2s }
+    .foot-col ul li a:hover { color:var(--gold) }
+    .socials { display:flex; gap:.75rem; margin-bottom:1.2rem }
+    .soc-btn {
+      width:38px; height:38px; border-radius:50%;
+      border:1px solid rgba(255,255,255,.18);
+      display:flex; align-items:center; justify-content:center;
+      color:rgba(255,255,255,.5); font-size:.74rem;
+      transition:all .25s var(--ease); cursor:pointer;
+    }
+    .soc-btn:hover { border-color:var(--gold); color:var(--gold); transform:translateY(-3px) }
+    .sub-form { display:flex; margin-top:.5rem; border-radius:6px; overflow:hidden }
+    .sub-form input {
+      flex:1; padding:.7rem 1rem; background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1); border-right:none; color:#fff;
+      font-family:var(--fb); font-size:.76rem; outline:none;
+      border-radius:6px 0 0 6px; transition:border-color .2s;
+    }
+    .sub-form input:focus  { border-color:rgba(244,185,66,.55) }
+    .sub-form input::placeholder { color:rgba(255,255,255,.28) }
+    .sub-form button {
+      padding:.7rem 1.1rem; background:var(--gold); color:var(--dark);
+      border:none; cursor:pointer; font-size:.85rem;
+      border-radius:0 6px 6px 0; transition:background .25s;
+    }
+    .sub-form button:hover { background:var(--gold-dk) }
+    .foot-hr { max-width:1240px; margin:0 auto; border:none; border-top:1px solid rgba(255,255,255,.08) }
+    .foot-bottom {
+      max-width:1240px; margin:1.8rem auto 0;
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:.72rem; color:rgba(255,255,255,.28); flex-wrap:wrap; gap:.5rem;
+    }
+    .foot-bottom a { color:rgba(255,255,255,.38); transition:color .2s }
+    .foot-bottom a:hover { color:var(--gold) }
+
+    /* =====================================================================
+       RESPONSIVE
+    ===================================================================== */
+    @media(max-width:1100px){
+      #navbar,#navbar.scrolled { padding-left:2.5rem; padding-right:2.5rem }
+      .pkg-row,.pkg-row.rev { flex-direction:column; min-height:auto }
+      .pkg-media { flex:none; width:100%; min-height:360px }
+      .pkg-copy,.pkg-row.rev .pkg-copy { flex:none; width:100%; padding:2.5rem 2rem }
+      .blob { inset:-6% -4%; width:108%; height:112% }
+      .foot-grid { grid-template-columns:1fr 1fr }
+      .why-grid { grid-template-columns:repeat(2,1fr) }
+      .gallery-grid {
+        grid-template-columns:1fr 1fr;
+        grid-template-rows:repeat(3,200px);
+      }
+      .gal-item:nth-child(1) { grid-row:span 1 }
+      .gal-item:nth-child(6) { grid-column:span 2; height:200px }
+      .contact-wrap { grid-template-columns:1fr; gap:3rem }
+      .testi-outer { padding:0 60px }
+    }
+    @media(max-width:768px){
+      #navbar,#navbar.scrolled { padding:1rem 1.5rem }
+      .nav-links,#navbar>.btn-primary { display:none }
+      .hamburger { display:flex }
+      .interest-grid { grid-template-columns:1fr !important; max-width:340px !important }
+      .stats-inner { grid-template-columns:repeat(2,1fr); gap:1.5rem }
+      footer { padding:4rem 1.5rem 2rem }
+      .foot-grid { grid-template-columns:1fr; gap:2.5rem }
+      .foot-bottom { flex-direction:column; text-align:center; gap:.5rem }
+      .testi-prev,.testi-next { display:none }
+      .testi-outer { padding:0 }
+      .form-row { grid-template-columns:1fr }
+      .why-grid { grid-template-columns:1fr 1fr }
+      .gallery-grid { grid-template-columns:1fr 1fr; grid-template-rows:auto }
+      .gal-item { height:180px }
+      .gal-item:nth-child(1) { grid-row:span 1 }
+      .gal-item:nth-child(6) { grid-column:span 2; height:180px }
+    }
+    @media(max-width:480px){
+      .hero-title { letter-spacing:2px }
+      .hero-btns { flex-direction:column; align-items:center }
+      .pkg-copy,.pkg-row.rev .pkg-copy { padding:2rem 1.2rem }
+      .why-grid { grid-template-columns:1fr }
+      .gallery-grid { grid-template-columns:1fr }
+      .gal-item,.gal-item:nth-child(6) { height:200px; grid-column:span 1 }
+      .testi-card { padding:2rem 1.5rem }
+      .testi-text { font-size:1rem }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════ PRELOADER ═══════ -->
+  <div id="preloader" role="status" aria-label="Loading">
+    <div class="pre-logo">Twenzetu <span>Tours</span></div>
+    <div class="pre-track"><div class="pre-fill"></div></div>
+  </div>
+
+  <!-- ═══════ CUSTOM CURSOR ═══════ -->
+  <div class="cur-dot" id="curDot" aria-hidden="true"></div>
+  <div class="cur-ring" id="curRing" aria-hidden="true"></div>
+
+  <!-- ═══════ SCROLL PROGRESS ═══════ -->
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <!-- ═══════ BACK-TO-TOP ═══════ -->
+  <button id="btt" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+  <!-- ═══════ MOBILE OVERLAY ═══════ -->
+  <div class="mob-overlay" id="mobOverlay" role="dialog" aria-label="Mobile navigation">
+    <a href="#hero"         onclick="closeMob()">Home</a>
+    <a href="#why"          onclick="closeMob()">Why Us</a>
+    <a href="#packages"     onclick="closeMob()">Packages</a>
+    <a href="#testimonials" onclick="closeMob()">Reviews</a>
+    <a href="#contact"      onclick="closeMob()">Contact</a>
+    <a href="#packages" class="btn-primary" onclick="closeMob()" style="font-size:.8rem">Book Now</a>
+  </div>
+
+  <!-- ═══════ NAVBAR ═══════ -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#hero" class="nav-logo">Twenzetu <span class="g">Tours</span></a>
+    <div class="nav-links">
+      <a href="#why">Why Us</a>
+      <a href="#interests">Interests</a>
+      <a href="#packages">Packages</a>
+      <a href="#testimonials">Reviews</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#packages" class="btn-primary">Book Now</a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ═══════ HERO ═══════ -->
+  <!-- FIX: No separate .hero-bg div. Background is directly on #hero via CSS.
+       This is robust — works even if the external image is slow or fails. -->
+  <section id="hero" role="banner">
+
+    <!-- Floating ambient particles (injected by JS) -->
+    <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
+
+    <div class="hero-body">
+      <p class="hero-eyebrow">✦ Nairobi · Kenya ✦</p>
+      <h1 class="hero-title">Your <em>Kenyan</em><br/>Travel Companion</h1>
+      <p class="hero-sub">From the crimson savannahs of the Maasai Mara to the turquoise tides of Diani Beach — we craft journeys as wild and beautiful as Kenya herself.</p>
+      <div class="hero-btns">
+        <a href="#packages" class="btn-primary">Plan My Safari</a>
+        <a href="#interests" class="btn-ghost">Explore Interests</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <div class="scroll-mouse"></div>
+      <span>Scroll</span>
+    </div>
+
+    <!-- Organic brush-stroke bottom edge -->
+    <div class="hero-edge-wrap" aria-hidden="true">
+      <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,52 C90,18 210,74 370,46 C490,24 560,72 680,50
+                 C810,26 870,70 1020,48 C1150,28 1280,66 1440,46
+                 L1440,90 L0,90 Z" fill="#FAF8F2"/>
+        <path d="M0,68 C130,44 270,80 430,60 C580,42 640,74 800,60
+                 C950,46 1060,74 1200,60 C1320,48 1390,70 1440,62
+                 L1440,90 L0,90 Z" fill="#FAF8F2" opacity="0.6"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ WHY CHOOSE US ═══════ -->
+  <section id="why">
+    <div class="section-head reveal">
+      <h2>Why Choose Us</h2>
+      <div class="rule"></div>
+      <p>We don't just book trips. We architect memories built around your wildest Kenya dreams.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal d1">
+        <div class="why-icon"><i class="fas fa-shield-halved"></i></div>
+        <h3>Safe &amp; Trusted</h3>
+        <p>Licensed by Kenya Tourism Board with 12+ years of zero-incident operations across every major park and coastline.</p>
+      </div>
+      <div class="why-card reveal d2">
+        <div class="why-icon"><i class="fas fa-star"></i></div>
+        <h3>Expert Guides</h3>
+        <p>Kenya Wildlife Service-certified naturalist guides with encyclopaedic knowledge of the Big Five and local ecosystems.</p>
+      </div>
+      <div class="why-card reveal d3">
+        <div class="why-icon"><i class="fas fa-sliders"></i></div>
+        <h3>Fully Custom</h3>
+        <p>Every itinerary is tailor-made. We listen first, plan second — no cookie-cutter tours, ever.</p>
+      </div>
+      <div class="why-card reveal d4">
+        <div class="why-icon"><i class="fas fa-leaf"></i></div>
+        <h3>Eco Conscious</h3>
+        <p>We partner only with lodges committed to conservation and community benefit across Kenya's ecosystems.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ EXPLORE INTERESTS ═══════ -->
+  <section id="interests">
+    <div class="section-head reveal">
+      <h2>Explore Your Interest</h2>
+      <div class="rule"></div>
+      <p>Kenya is a land of infinite adventures. Pick your passion and we'll craft the perfect itinerary.</p>
+    </div>
+    <div class="chips-bar reveal d1" role="group" aria-label="Filter interests">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="safari">🦁 Safari</button>
+      <button class="chip" data-filter="beach">🏖️ Beach</button>
+      <button class="chip" data-filter="culture">🎭 Culture</button>
+      <button class="chip" data-filter="hiking">⛰️ Hiking</button>
+    </div>
+    <div class="interest-grid" id="intGrid">
+      <div class="int-card reveal d1" data-cat="safari">
+        <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=600&q=80"
+             alt="Safari — Elephants at Amboseli" loading="lazy"/>
+        <span class="int-card-label">Safari</span>
+      </div>
+      <div class="int-card reveal d2" data-cat="hiking">
+        <img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=600&q=80"
+             alt="Hiking — Mount Kenya trek" loading="lazy"/>
+        <span class="int-card-label">Hiking</span>
+      </div>
+      <div class="int-card reveal d3" data-cat="beach">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80"
+             alt="Beach — Diani coast" loading="lazy"/>
+        <span class="int-card-label">Beach</span>
+      </div>
+      <div class="int-card reveal" data-cat="culture" style="display:none">
+        <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&q=80"
+             alt="Culture — Maasai village" loading="lazy"/>
+        <span class="int-card-label">Culture</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FEATURED PACKAGES ═══════ -->
+  <section id="packages">
+    <div class="section-head reveal">
+      <h2>Featured Travel Packages</h2>
+      <div class="rule"></div>
+      <p>Carefully curated experiences for every kind of traveller — from romantic escapes to wild family adventures.</p>
+    </div>
+    <div class="pkg-list">
+
+      <!-- Romantic Holiday -->
+      <div class="pkg-row">
+        <div class="pkg-media reveal-left">
+          <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105,60 C205,8 455,0 560,82 C665,164 655,392 540,465 C425,538 158,542 62,450 C-34,358 5,112 105,60 Z" fill="#E9E5D8" opacity="0.9"/>
+            <path d="M140,95 C228,50 430,44 518,115 C606,186 594,368 496,430 C398,492 172,498 80,418 C-12,338 52,140 140,95 Z" fill="#DDD9CA" opacity="0.55"/>
+          </svg>
+          <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&q=80"
+               alt="Romantic Mara sunset" class="pkg-photo" loading="lazy"/>
+        </div>
+        <div class="pkg-copy reveal-right">
+          <p class="pkg-tag">Most Popular</p>
+          <h3 class="pkg-title">Romantic<br/>Holiday</h3>
+          <p class="pkg-desc">Drift across the Mara at sunrise in a private hot-air balloon. Dine under a cathedral of stars at a luxury tented camp. Watch the Great Migration with just the two of you — and the wild.</p>
+          <div class="pkg-badges">
+            <span class="pkg-badge"><i class="fas fa-clock"></i> 7 Days</span>
+            <span class="pkg-badge"><i class="fas fa-map-marker-alt"></i> Maasai Mara</span>
+            <span class="pkg-badge"><i class="fas fa-star"></i> 5-Star Lodge</span>
+          </div>
+          <p class="pkg-price">Start From <span class="amt">KSh 85,000</span></p>
+          <a href="#contact" class="btn-primary">Explore More</a>
+        </div>
+      </div>
+
+      <!-- All For The Family -->
+      <div class="pkg-row rev">
+        <div class="pkg-media reveal-right">
+          <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
+            <path d="M92,72 C192,18 458,10 562,92 C666,174 650,385 538,460 C426,535 150,530 55,436 C-40,342 -8,126 92,72 Z" fill="#E4E0D2" opacity="0.9"/>
+            <path d="M128,105 C218,58 428,52 516,122 C604,192 590,370 490,432 C390,494 162,498 70,416 C-22,334 38,152 128,105 Z" fill="#D8D4C5" opacity="0.55"/>
+          </svg>
+          <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80"
+               alt="Elephants at Amboseli" class="pkg-photo" loading="lazy"/>
+        </div>
+        <div class="pkg-copy reveal-left">
+          <p class="pkg-tag">Family Favourite</p>
+          <h3 class="pkg-title">All For<br/>The Family</h3>
+          <p class="pkg-desc">Watch baby elephants play in Amboseli with snow-capped Kilimanjaro as your backdrop. Kid-friendly game drives, Maasai village visits, and sun-soaked afternoons at Diani Beach.</p>
+          <div class="pkg-badges">
+            <span class="pkg-badge"><i class="fas fa-clock"></i> 10 Days</span>
+            <span class="pkg-badge"><i class="fas fa-map-marker-alt"></i> Amboseli &amp; Coast</span>
+            <span class="pkg-badge"><i class="fas fa-child"></i> Family Friendly</span>
+          </div>
+          <p class="pkg-price">Start From <span class="amt">KSh 120,000</span></p>
+          <a href="#contact" class="btn-primary">Explore More</a>
+        </div>
+      </div>
+
+      <!-- Conquer Your Fear -->
+      <div class="pkg-row">
+        <div class="pkg-media reveal-left">
+          <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
+            <path d="M98,68 C198,14 462,6 566,88 C670,170 655,388 540,462 C425,536 152,532 56,438 C-40,344 -2,122 98,68 Z" fill="#E2DFCF" opacity="0.9"/>
+            <path d="M132,102 C222,55 430,50 518,120 C606,190 593,368 492,430 C391,492 162,496 70,414 C-22,332 42,148 132,102 Z" fill="#D6D3C2" opacity="0.55"/>
+          </svg>
+          <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80"
+               alt="Adventure in Kenya wilderness" class="pkg-photo" loading="lazy"/>
+        </div>
+        <div class="pkg-copy reveal-right">
+          <p class="pkg-tag">For The Bold</p>
+          <h3 class="pkg-title">Conquer<br/>Your Fear</h3>
+          <p class="pkg-desc">Summit Point Lenana on Mount Kenya at dawn. White-water raft the roaring Tana River. Dive the coral gardens of Watamu Marine Park or paraglide over the Great Rift Valley.</p>
+          <div class="pkg-badges">
+            <span class="pkg-badge"><i class="fas fa-clock"></i> 5 Days</span>
+            <span class="pkg-badge"><i class="fas fa-map-marker-alt"></i> Mt. Kenya</span>
+            <span class="pkg-badge"><i class="fas fa-mountain"></i> Adventure</span>
+          </div>
+          <p class="pkg-price">Start From <span class="amt">KSh 55,000</span></p>
+          <a href="#contact" class="btn-primary">Explore More</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════ STATS ═══════ -->
+  <section id="stats" aria-label="Achievements">
+    <div class="stats-inner">
+      <div class="reveal">
+        <div class="stat-num" data-target="12">0</div>
+        <div class="stat-lbl">Years of Experience</div>
+      </div>
+      <div class="reveal d1">
+        <div class="stat-num" data-target="48">0</div>
+        <div class="stat-lbl">Kenyan Destinations</div>
+      </div>
+      <div class="reveal d2">
+        <div class="stat-num" data-target="9400">0</div>
+        <div class="stat-lbl">Happy Travellers</div>
+      </div>
+      <div class="reveal d3">
+        <div class="stat-num" data-target="98">0</div>
+        <div class="stat-lbl">% Satisfaction Rate</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ GALLERY ═══════ -->
+  <!-- FIX: 3-column grid, item 1 spans 2 rows, item 6 spans 2 cols on row 3 -->
+  <section id="gallery">
+    <div class="section-head reveal">
+      <h2>Kenya Through Our Lens</h2>
+      <div class="rule"></div>
+      <p>Every frame a memory. Every journey a story worth telling.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gal-item reveal">
+        <img src="https://images.unsplash.com/photo-1612278675615-7b093b07772d?w=800&q=80"
+             alt="Lion on the savannah" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Maasai Mara</span></div>
+      </div>
+      <div class="gal-item reveal d1">
+        <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80"
+             alt="Giraffe at sunset" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Amboseli</span></div>
+      </div>
+      <div class="gal-item reveal d2">
+        <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&q=80"
+             alt="Maasai culture" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Rift Valley</span></div>
+      </div>
+      <div class="gal-item reveal d1">
+        <img src="https://images.unsplash.com/photo-1504432842672-1a79f78e4084?w=600&q=80"
+             alt="Diani beach" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Diani Beach</span></div>
+      </div>
+      <div class="gal-item reveal d2">
+        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80"
+             alt="Hot air balloon safari" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Balloon Safari</span></div>
+      </div>
+      <!-- Item 6: wide panoramic strip spanning cols 2–3 on row 3 -->
+      <div class="gal-item reveal d3">
+        <img src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80"
+             alt="Mount Kenya at dawn" loading="lazy"/>
+        <div class="gal-overlay"><i class="fas fa-expand"></i><span>Mt. Kenya</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ TESTIMONIALS ═══════ -->
+  <!-- FIX: .testi-outer has overflow:visible — arrows are now visible.
+       .testi-carousel inside has overflow:hidden — slides are clipped correctly. -->
+  <section id="testimonials">
+    <div class="section-head reveal">
+      <h2>What Travellers Say</h2>
+      <div class="rule"></div>
+      <p>9,400+ adventurers have trusted us with their most precious asset — their time.</p>
+    </div>
+
+    <div class="testi-outer reveal">
+      <!-- Arrows OUTSIDE overflow:hidden container -->
+      <button class="testi-prev" id="testiPrev" aria-label="Previous review">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <button class="testi-next" id="testiNext" aria-label="Next review">
+        <i class="fas fa-arrow-right"></i>
+      </button>
+
+      <!-- Carousel track (overflow:hidden here, not on wrapper) -->
+      <div class="testi-carousel">
+        <div class="testi-track" id="testiTrack">
+
+          <div class="testi-slide">
+            <div class="testi-card">
+              <span class="testi-quote-mark" aria-hidden="true">"</span>
+              <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <p class="testi-text">Twenzetu turned our honeymoon into a masterpiece. The balloon over the Mara, the candlelit dinner in the bush — we're still pinching ourselves. Kenya through their eyes is unlike anything we could have planned ourselves.</p>
+              <div class="testi-author">
+                <img class="testi-avatar" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80" alt="Amina Kimani"/>
+                <div class="testi-info">
+                  <h4>Amina &amp; David Kimani</h4>
+                  <p>Nairobi, Kenya</p>
+                  <span class="testi-trip"><i class="fas fa-map-marker-alt"></i> Romantic Holiday · Maasai Mara</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-slide">
+            <div class="testi-card">
+              <span class="testi-quote-mark" aria-hidden="true">"</span>
+              <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <p class="testi-text">Three kids, two grandparents, and one wild dream — Twenzetu made it happen flawlessly. The Amboseli family camp was pure magic. Watching our 7-year-old encounter an elephant ten metres away was worth every shilling.</p>
+              <div class="testi-author">
+                <img class="testi-avatar" src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=120&q=80" alt="The Odhiambo Family"/>
+                <div class="testi-info">
+                  <h4>The Odhiambo Family</h4>
+                  <p>Mombasa, Kenya</p>
+                  <span class="testi-trip"><i class="fas fa-map-marker-alt"></i> Family Safari · Amboseli</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-slide">
+            <div class="testi-card">
+              <span class="testi-quote-mark" aria-hidden="true">"</span>
+              <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+              <p class="testi-text">I've done adventure travel on five continents and this was my most organised, most memorable trip. Summit day on Mount Kenya was brutal and beautiful. Our guide Joseph knew every plant, every bird call. Extraordinary.</p>
+              <div class="testi-author">
+                <img class="testi-avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&q=80" alt="Marcus Veldtman"/>
+                <div class="testi-info">
+                  <h4>Marcus Veldtman</h4>
+                  <p>Cape Town, South Africa</p>
+                  <span class="testi-trip"><i class="fas fa-map-marker-alt"></i> Conquer Your Fear · Mt. Kenya</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-slide">
+            <div class="testi-card">
+              <span class="testi-quote-mark" aria-hidden="true">"</span>
+              <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <p class="testi-text">From the moment we landed to the tearful goodbye at the airport, every detail was thoughtful. Diani Beach was paradise. The Maasai cultural evening was humbling. We booked again before we even got home. Asante sana!</p>
+              <div class="testi-author">
+                <img class="testi-avatar" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80" alt="Sophie Bianchi"/>
+                <div class="testi-info">
+                  <h4>Sophie &amp; Luca Bianchi</h4>
+                  <p>Milan, Italy</p>
+                  <span class="testi-trip"><i class="fas fa-map-marker-alt"></i> Beach &amp; Culture · Diani</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testi-slide">
+            <div class="testi-card">
+              <span class="testi-quote-mark" aria-hidden="true">"</span>
+              <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+              <p class="testi-text">As a solo female traveller I was anxious about Kenya. Twenzetu made me feel completely safe and completely free. Every guide was warm, professional and endlessly knowledgeable. I saw my first leopard. I cried actual tears.</p>
+              <div class="testi-author">
+                <img class="testi-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80" alt="Priya Sharma"/>
+                <div class="testi-info">
+                  <h4>Priya Sharma</h4>
+                  <p>Mumbai, India</p>
+                  <span class="testi-trip"><i class="fas fa-map-marker-alt"></i> Solo Safari · Tsavo East</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /testi-track -->
+      </div><!-- /testi-carousel -->
+
+      <!-- Dots and progress below arrows but still in .testi-outer -->
+      <div class="testi-dots" id="testiDots" role="tablist" aria-label="Testimonial navigation">
+        <button class="testi-dot active" data-idx="0" role="tab" aria-label="Review 1"></button>
+        <button class="testi-dot" data-idx="1" role="tab" aria-label="Review 2"></button>
+        <button class="testi-dot" data-idx="2" role="tab" aria-label="Review 3"></button>
+        <button class="testi-dot" data-idx="3" role="tab" aria-label="Review 4"></button>
+        <button class="testi-dot" data-idx="4" role="tab" aria-label="Review 5"></button>
+      </div>
+      <div class="testi-progress-line">
+        <div class="testi-progress-fill" id="testiFill"></div>
+      </div>
+
+    </div><!-- /testi-outer -->
+  </section>
+
+  <!-- ═══════ CONTACT ═══════ -->
+  <section id="contact">
+    <div class="section-head reveal">
+      <h2>Plan Your Journey</h2>
+      <div class="rule"></div>
+      <p>Tell us your dream and we'll make it happen. Every great safari starts with a conversation.</p>
+    </div>
+    <div class="contact-wrap">
+      <div class="contact-info reveal-left">
+        <h3>Let's Start<br/>Planning</h3>
+        <p>Whether you're picturing a sunrise balloon ride over the Mara or a family week in Amboseli, our team is ready to craft something extraordinary around you.</p>
+        <div class="c-info-list">
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-phone"></i></div>
+            <div class="c-info-text"><h5>Call Us</h5><p>+254 700 000 000</p></div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-envelope"></i></div>
+            <div class="c-info-text"><h5>Email Us</h5><p>hello@twenzetu.co.ke</p></div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="c-info-text">
+              <h5>Visit Us</h5>
+              <p>Kimathi Street, Nairobi CBD<br/>Mon–Sat: 8am – 6pm EAT</p>
+            </div>
+          </div>
+        </div>
+        <a href="tel:+254700000000" class="btn-dark">Call Us Now</a>
+      </div>
+
+      <div class="contact-form reveal-right" id="contactFormWrap">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" placeholder="Amina" autocomplete="given-name"/>
+          </div>
+          <div class="form-group">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" placeholder="Kimani" autocomplete="family-name"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="femail">Email Address</label>
+            <input type="email" id="femail" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label for="fphone">Phone Number</label>
+            <input type="tel" id="fphone" placeholder="+254 700 000 000" autocomplete="tel"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="fpackage">Interested Package</label>
+          <select id="fpackage">
+            <option value="">— Select a package —</option>
+            <option>Romantic Holiday · Maasai Mara</option>
+            <option>All For The Family · Amboseli</option>
+            <option>Conquer Your Fear · Mt. Kenya</option>
+            <option>Beach Escape · Diani</option>
+            <option>Cultural Journey · Rift Valley</option>
+            <option>Custom Itinerary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fmsg">Tell Us Your Dream</label>
+          <textarea id="fmsg" placeholder="Describe your ideal Kenyan adventure — dates, group size, special requests..."></textarea>
+        </div>
+        <button type="button" class="btn-primary" id="sendBtn" style="align-self:flex-start">
+          Send My Enquiry
+        </button>
+        <div class="form-success" id="formSuccess">
+          🎉 Asante! Your enquiry has landed. Our team will reach out within 24 hours.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer id="footer" role="contentinfo">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#hero" class="flogo">Twenzetu <span class="g">Tours</span></a>
+        <p>Your trusted guide to the wild, the beautiful, and the unforgettable across the Kenyan landscape.</p>
+        <p class="tagline">"Twenzetu" — Swahili for "Let's go together."</p>
+      </div>
+      <div class="foot-col">
+        <h4>Contact Us</h4>
+        <ul>
+          <li><i class="fas fa-envelope"></i>hello@twenzetu.co.ke</li>
+          <li><i class="fas fa-phone"></i>+254 700 000 000</li>
+          <li><i class="fas fa-map-marker-alt"></i>Kimathi Street, Nairobi</li>
+          <li><i class="fas fa-clock"></i>Mon–Sat: 8am – 6pm EAT</li>
+        </ul>
+        <div style="margin-top:1.2rem">
+          <a href="#contact" style="color:var(--gold);font-size:.72rem;letter-spacing:2px;font-weight:700;text-transform:uppercase">→ Get In Touch</a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>Follow Us</h4>
+        <div class="socials">
+          <a href="#" class="soc-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="soc-btn" aria-label="Twitter/X"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="soc-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="soc-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="soc-btn" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        </div>
+        <ul>
+          <li><i class="fab fa-instagram"></i><a href="#">@twenzetu_tours</a></li>
+          <li><i class="fab fa-facebook-f"></i><a href="#">twenzetutours</a></li>
+          <li><i class="fab fa-youtube"></i><a href="#">Twenzetu Tours TV</a></li>
+          <li><i class="fab fa-twitter"></i><a href="#">@TwenzetuTours</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Subscribe To Our News</h4>
+        <p style="font-size:.8rem;font-weight:300;line-height:1.85;margin-bottom:1rem">
+          Exclusive safari deals, new routes, and travel inspiration straight to your inbox.
+        </p>
+        <div class="sub-form">
+          <input type="email" id="subInput" placeholder="Your email address" aria-label="Email address"/>
+          <button type="button" id="subBtn" aria-label="Subscribe">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="foot-hr"/>
+    <div class="foot-bottom">
+      <span>© 2025 Twenzetu Tours Corporation. All Rights Reserved.</span>
+      <span>
+        <a href="#">Privacy Policy</a> &nbsp;·&nbsp;
+        <a href="#">Terms</a> &nbsp;·&nbsp;
+        <a href="#">Sitemap</a>
+      </span>
+      <span>Crafted with ❤️ in Nairobi, Kenya</span>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       JAVASCRIPT — all fixes applied
+  ===================================================================== -->
+  <script>
+  (() => {
+    'use strict';
+
+    /* ──────────────────────────────────────────────
+       1. PRELOADER
+    ────────────────────────────────────────────── */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('preloader').classList.add('done');
+      }, 1900);
+    });
+
+    /* ──────────────────────────────────────────────
+       2. CUSTOM CURSOR
+       FIX: only enable on true pointer (non-touch) devices.
+       Uses JS class on body instead of cursor:none on every element.
+    ────────────────────────────────────────────── */
+    const dot  = document.getElementById('curDot');
+    const ring = document.getElementById('curRing');
+
+    // Only enable custom cursor on fine-pointer (mouse) devices
+    if (window.matchMedia('(pointer:fine)').matches) {
+      document.body.classList.add('has-custom-cursor');
+
+      let mx = 0, my = 0, rx = 0, ry = 0;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px';
+        dot.style.top  = my + 'px';
+      }, { passive: true });
+
+      // Smooth ring lag via rAF
+      (function raf() {
+        rx += (mx - rx) * 0.14;
+        ry += (my - ry) * 0.14;
+        ring.style.left = rx + 'px';
+        ring.style.top  = ry + 'px';
+        requestAnimationFrame(raf);
+      })();
+
+      // Expand cursor on interactive elements
+      const hoverTargets = 'a, button, .chip, .int-card, .gal-item, .why-card, .pkg-photo, .testi-dot, .soc-btn';
+      document.querySelectorAll(hoverTargets).forEach(el => {
+        el.addEventListener('mouseenter', () => { dot.classList.add('hov'); ring.classList.add('hov'); });
+        el.addEventListener('mouseleave', () => { dot.classList.remove('hov'); ring.classList.remove('hov'); });
+      });
+    }
+
+    /* ──────────────────────────────────────────────
+       3. SCROLL PROGRESS BAR
+    ────────────────────────────────────────────── */
+    const pb = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      pb.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+    }, { passive: true });
+
+    /* ──────────────────────────────────────────────
+       4. NAVBAR — transparent → solid on scroll
+    ────────────────────────────────────────────── */
+    const navbar = document.getElementById('navbar');
+    const onNavScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 60);
+    window.addEventListener('scroll', onNavScroll, { passive: true });
+    onNavScroll();
+
+    /* ──────────────────────────────────────────────
+       5. BACK TO TOP
+    ────────────────────────────────────────────── */
+    const btt = document.getElementById('btt');
+    window.addEventListener('scroll', () => btt.classList.toggle('show', window.scrollY > 400), { passive: true });
+    btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    /* ──────────────────────────────────────────────
+       6. MOBILE MENU
+    ────────────────────────────────────────────── */
+    const hb  = document.getElementById('hamburger');
+    const mob = document.getElementById('mobOverlay');
+    let menuOpen = false;
+
+    function openMob() {
+      menuOpen = true;
+      mob.classList.add('open');
+      hb.setAttribute('aria-expanded', 'true');
+      const [s1, s2, s3] = hb.querySelectorAll('span');
+      s1.style.transform = 'rotate(45deg) translate(5px,5px)';
+      s2.style.opacity   = '0';
+      s3.style.transform = 'rotate(-45deg) translate(5px,-5px)';
+    }
+    function closeMob() {
+      menuOpen = false;
+      mob.classList.remove('open');
+      hb.setAttribute('aria-expanded', 'false');
+      hb.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+    }
+    // Expose closeMob globally for inline onclick
+    window.closeMob = closeMob;
+
+    hb.addEventListener('click', () => menuOpen ? closeMob() : openMob());
+    mob.addEventListener('click', e => { if (e.target === mob) closeMob(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) closeMob(); });
+
+    /* ──────────────────────────────────────────────
+       7. HERO PARALLAX
+       FIX: animate backgroundPositionY on #hero directly.
+       This is reliable because the image is on the element itself.
+    ────────────────────────────────────────────── */
+    const hero = document.getElementById('hero');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY < window.innerHeight) {
+        // Shift the background origin downward as user scrolls
+        const shift = window.scrollY * 0.35;
+        hero.style.backgroundPositionY = `calc(50% + ${shift}px)`;
+      }
+    }, { passive: true });
+
+    /* ──────────────────────────────────────────────
+       8. HERO PARTICLES
+    ────────────────────────────────────────────── */
+    const pContainer = document.getElementById('heroParticles');
+    [
+      { w:8,  h:8,  x:12,  y:28,  dur:10, del:0,   tx:30,  ty:-40, sc:1.5 },
+      { w:12, h:12, x:82,  y:22,  dur:14, del:2,   tx:-25, ty:-55, sc:1.2 },
+      { w:5,  h:5,  x:45,  y:72,  dur:11, del:1,   tx:50,  ty:-30, sc:1.8 },
+      { w:16, h:16, x:68,  y:60,  dur:16, del:3,   tx:-35, ty:-45, sc:1.1 },
+      { w:6,  h:6,  x:25,  y:55,  dur:9,  del:.5,  tx:25,  ty:-35, sc:1.6 },
+      { w:10, h:10, x:90,  y:78,  dur:12, del:1.5, tx:-45, ty:-25, sc:1.3 },
+      { w:7,  h:7,  x:55,  y:15,  dur:13, del:2.5, tx:35,  ty:-50, sc:1.4 },
+      { w:9,  h:9,  x:35,  y:85,  dur:15, del:.8,  tx:-25, ty:-40, sc:1.2 },
+    ].forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.style.cssText =
+        `width:${p.w}px;height:${p.h}px;left:${p.x}%;top:${p.y}%;`
+        + `--dur:${p.dur}s;--del:${p.del}s;--tx:${p.tx}px;--ty:${p.ty}px;--sc:${p.sc}`;
+      pContainer.appendChild(el);
+    });
+
+    /* ──────────────────────────────────────────────
+       9. SCROLL REVEAL
+    ────────────────────────────────────────────── */
+    const revObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+            .forEach(el => revObs.observe(el));
+
+    /* ──────────────────────────────────────────────
+       10. STATS COUNTER
+    ────────────────────────────────────────────── */
+    const cntObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el  = e.target;
+        const end = parseInt(el.dataset.target, 10);
+        const sfx = (el.nextElementSibling?.textContent || '').includes('%') ? '%' : '+';
+        let cur = 0;
+        const step = Math.max(1, Math.ceil(end / 65));
+        const timer = setInterval(() => {
+          cur += step;
+          if (cur >= end) { el.textContent = end.toLocaleString() + sfx; clearInterval(timer); }
+          else            { el.textContent = cur.toLocaleString(); }
+        }, 22);
+        cntObs.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-num[data-target]').forEach(el => cntObs.observe(el));
+
+    /* ──────────────────────────────────────────────
+       11. INTEREST FILTER CHIPS
+    ────────────────────────────────────────────── */
+    const chips   = document.querySelectorAll('.chip');
+    const iCards  = document.querySelectorAll('.int-card');
+    const intGrid = document.getElementById('intGrid');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const f = chip.dataset.filter;
+        iCards.forEach(card => {
+          const show = f === 'all' || card.dataset.cat === f;
+          card.style.display = show ? 'block' : 'none';
+        });
+        const n = [...iCards].filter(c => c.style.display !== 'none').length;
+        intGrid.style.gridTemplateColumns = n === 1 ? '1fr' : n === 2 ? 'repeat(2,1fr)' : 'repeat(3,1fr)';
+        intGrid.style.maxWidth            = n === 1 ? '340px' : n === 2 ? '720px' : '1080px';
+      });
+    });
+
+    /* ──────────────────────────────────────────────
+       12. TESTIMONIALS CAROUSEL
+       FIX: arrows now work because they're in .testi-outer (no overflow:hidden)
+    ────────────────────────────────────────────── */
+    const track   = document.getElementById('testiTrack');
+    const fill    = document.getElementById('testiFill');
+    const dots    = document.querySelectorAll('.testi-dot');
+    const slides  = document.querySelectorAll('.testi-slide');
+    const TOTAL   = slides.length;
+    const DELAY   = 5000;
+    let current   = 0;
+    let autoTimer = null;
+    let fillStart = null;
+    let fillRaf   = null;
+
+    function goTo(idx) {
+      current = ((idx % TOTAL) + TOTAL) % TOTAL;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function startFill() {
+      fill.style.transition = 'none';
+      fill.style.width = '0%';
+      void fill.offsetWidth; // force reflow
+      fill.style.transition = `width ${DELAY}ms linear`;
+      fill.style.width = '100%';
+    }
+
+    function startAuto() {
+      clearTimeout(autoTimer);
+      startFill();
+      autoTimer = setTimeout(() => {
+        goTo(current + 1);
+        startAuto();
+      }, DELAY);
+    }
+
+    function pauseAuto() {
+      clearTimeout(autoTimer);
+      // Freeze the fill at its current visual width
+      const computedW = getComputedStyle(fill).width;
+      fill.style.transition = 'none';
+      fill.style.width = computedW;
+    }
+
+    document.getElementById('testiPrev').addEventListener('click', () => { goTo(current - 1); startAuto(); });
+    document.getElementById('testiNext').addEventListener('click', () => { goTo(current + 1); startAuto(); });
+    dots.forEach(d => d.addEventListener('click', () => { goTo(parseInt(d.dataset.idx, 10)); startAuto(); }));
+
+    // Pause on hover / resume on leave
+    const testiSection = document.getElementById('testimonials');
+    testiSection.addEventListener('mouseenter', pauseAuto);
+    testiSection.addEventListener('mouseleave', startAuto);
+
+    // Touch swipe
+    let touchX = null;
+    track.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend',   e => {
+      if (touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 40) { goTo(dx < 0 ? current + 1 : current - 1); startAuto(); }
+      touchX = null;
+    });
+
+    // Keyboard
+    testiSection.setAttribute('tabindex', '0');
+    testiSection.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  { goTo(current - 1); startAuto(); }
+      if (e.key === 'ArrowRight') { goTo(current + 1); startAuto(); }
+    });
+
+    goTo(0);
+    startAuto();
+
+    /* ──────────────────────────────────────────────
+       13. CONTACT FORM
+    ────────────────────────────────────────────── */
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.addEventListener('click', () => {
+      const fname = document.getElementById('fname').value.trim();
+      const email = document.getElementById('femail').value.trim();
+      const msg   = document.getElementById('fmsg').value.trim();
+      const suc   = document.getElementById('formSuccess');
+
+      if (!fname || !email.includes('@') || !msg) {
+        sendBtn.style.animation = 'shake .45s ease';
+        setTimeout(() => { sendBtn.style.animation = ''; }, 500);
+        return;
+      }
+
+      sendBtn.textContent = 'Sending…';
+      sendBtn.disabled    = true;
+
+      setTimeout(() => {
+        sendBtn.style.display = 'none';
+        suc.classList.add('show');
+        ['fname','lname','femail','fphone','fmsg'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        document.getElementById('fpackage').selectedIndex = 0;
+      }, 1200);
+    });
+
+    /* ──────────────────────────────────────────────
+       14. SUBSCRIBE FORM
+    ────────────────────────────────────────────── */
+    document.getElementById('subBtn').addEventListener('click', () => {
+      const inp = document.getElementById('subInput');
+      if (inp.value.includes('@')) {
+        inp.value = '';
+        inp.placeholder = '✓ Subscribed — asante!';
+        setTimeout(() => { inp.placeholder = 'Your email address'; }, 3500);
+      } else {
+        inp.style.borderColor = 'rgba(220,80,50,.65)';
+        inp.focus();
+        setTimeout(() => { inp.style.borderColor = ''; }, 1600);
+      }
+    });
+
+    /* ──────────────────────────────────────────────
+       15. ACTIVE NAV HIGHLIGHT ON SCROLL
+    ────────────────────────────────────────────── */
+    const sections = document.querySelectorAll('section[id], footer[id]');
+    const navAs    = document.querySelectorAll('.nav-links a');
+    const hlObs    = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navAs.forEach(a => a.classList.remove('active'));
+          const match = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+          if (match) match.classList.add('active');
+        }
+      });
+    }, { threshold: 0.4 });
+    sections.forEach(s => hlObs.observe(s));
+
+    /* ──────────────────────────────────────────────
+       16. WHY CARDS — icon bounce on first entry
+    ────────────────────────────────────────────── */
+    const whyObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.why-icon').forEach((icon, i) => {
+          setTimeout(() => { icon.style.animation = 'iconBounce .6s var(--spring) both'; }, i * 120);
+        });
+        whyObs.unobserve(e.target);
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.why-grid').forEach(g => whyObs.observe(g));
+
+    /* ──────────────────────────────────────────────
+       17. INJECT KEYFRAMES not easily done in CSS vars
+    ────────────────────────────────────────────── */
+    const ks = document.createElement('style');
+    ks.textContent = `
+      @keyframes shake {
+        0%,100%{transform:translateX(0)}
+        20%{transform:translateX(-6px)}40%{transform:translateX(6px)}
+        60%{transform:translateX(-4px)}80%{transform:translateX(4px)}
+      }
+      @keyframes iconBounce {
+        0%  {transform:scale(.5);opacity:0}
+        70% {transform:scale(1.15)}
+        100%{transform:scale(1);opacity:1}
+      }
+    `;
+    document.head.appendChild(ks);
+
+  })();
+  </script>
+</body>
+</html>

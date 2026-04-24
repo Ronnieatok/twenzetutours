@@ -5,10 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Twenzetu Tours — Your Kenyan Travel Companion</title>
   <meta name="description" content="Twenzetu Tours — Kenya's premier safari, beach and adventure travel company."/>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://twenzetutours.vercel.app/"/>
+  <meta property="og:title" content="Twenzetu Tours — Your Kenyan Travel Companion"/>
+  <meta property="og:description" content="Twenzetu Tours — Kenya's premier safari, beach and adventure travel company."/>
+  <meta property="og:image" content="https://i.postimg.cc/Hs19fbw8/africa-safaris.jpg"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:site_name" content="Twenzetu Tours"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Twenzetu Tours — Your Kenyan Travel Companion"/>
+  <meta name="twitter:description" content="Twenzetu Tours — Kenya's premier safari, beach and adventure travel company."/>
+  <meta name="twitter:image" content="https://i.postimg.cc/Hs19fbw8/africa-safaris.jpg"/>
+
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
-
+</head>
   <style>
     /* =====================================================================
        DESIGN TOKENS
@@ -37,7 +54,6 @@
     html  { scroll-behavior:smooth }
     body  { font-family:var(--fb); background:var(--cream); color:var(--dark);
             overflow-x:hidden; -webkit-font-smoothing:antialiased;
-            /* FIX: cursor:none only on non-touch via JS class added later */
           }
     img   { display:block; max-width:100% }
     a     { text-decoration:none }
@@ -252,7 +268,7 @@
     .mob-overlay.open a:nth-child(3){animation-delay:.15s}
     .mob-overlay.open a:nth-child(4){animation-delay:.20s}
     .mob-overlay.open a:nth-child(5){animation-delay:.25s}
-    .mob-overlay.open a:nth-child(6){animation-delay:.30s} /* FIX: was missing */
+    .mob-overlay.open a:nth-child(6){animation-delay:.30s}
     @keyframes mobIn { to{opacity:1;transform:none} }
     .mob-overlay a:hover { color:var(--gold) }
 
@@ -265,8 +281,6 @@
       position:relative;
       height:100vh;
       min-height:640px;
-      /* FIX: gradient + image on the section itself. Dark green fallback
-         shows if image fails to load. */
       background-color: #1a3020;
       background-image:
         linear-gradient(180deg,
@@ -277,7 +291,6 @@
       background-size: cover;
       background-position: center 50%;
       background-repeat: no-repeat;
-      /* FIX: no overflow:hidden on the hero itself — was clipping parallax */
       overflow: visible;
       display:flex; align-items:center; justify-content:center; text-align:center;
     }
@@ -342,8 +355,6 @@
       100%{transform:translateX(-50%) translateY(0);opacity:1}
     }
 
-    /* FIX: hero edge SVG uses position:absolute, overflow:hidden on a wrapper
-       so it clips only the edge element, not the hero background */
     .hero-edge-wrap {
       position:absolute; bottom:-1px; left:0; width:100%; z-index:4;
       line-height:0; overflow:hidden; pointer-events:none;
@@ -511,16 +522,12 @@
     #gallery { padding:6rem 2rem; background:var(--cream) }
     .gallery-grid {
       display:grid;
-      /* FIX: 3-column layout with item 1 spanning 2 rows, 5 items filling right 2×2 */
       grid-template-columns: 1.7fr 1fr 1fr;
       grid-template-rows: 255px 255px;
       gap:1rem; max-width:1200px; margin:0 auto;
     }
-    /* FIX: Only item 1 gets a row-span. All others are single cells. */
     .gal-item:nth-child(1) { grid-row:span 2 }
-    /* items 2-5 fill the remaining 4 cells. item 6 wraps to row 3 */
     .gal-item:nth-child(6) {
-      /* Span both right columns on row 3 for a wide panoramic item */
       grid-column: 2 / 4;
       height:160px;
     }
@@ -549,7 +556,7 @@
     }
 
     /* =====================================================================
-       TESTIMONIALS — FIX: arrows outside overflow:hidden container
+       TESTIMONIALS
     ===================================================================== */
     #testimonials {
       padding:7rem 2rem; background:var(--dark-2);
@@ -564,16 +571,13 @@
     #testimonials .section-head h2 { color:#fff }
     #testimonials .section-head p  { color:rgba(255,255,255,.5) }
 
-    /* FIX: outer wrapper is position:relative with NO overflow:hidden
-       so the arrows (absolutely positioned) are visible */
     .testi-outer {
       position:relative;
       max-width:1100px;
       margin:0 auto;
-      padding:0 80px; /* makes room for arrows */
+      padding:0 80px;
     }
 
-    /* FIX: inner carousel container has overflow:hidden (clips slides) */
     .testi-carousel {
       overflow:hidden;
       border-radius:4px;
@@ -620,7 +624,6 @@
     }
     .testi-trip i { font-size:.6rem }
 
-    /* FIX: arrows are positioned in .testi-outer (no overflow:hidden) */
     .testi-prev, .testi-next {
       position:absolute; top:50%; transform:translateY(-50%);
       width:48px; height:48px; border-radius:50%;
@@ -638,7 +641,6 @@
       background:rgba(244,185,66,.12);
     }
 
-    /* Dots */
     .testi-dots {
       display:flex; justify-content:center; gap:.65rem; margin-top:2.2rem;
     }
@@ -650,7 +652,6 @@
     }
     .testi-dot.active { background:var(--gold); width:28px; border-radius:4px }
 
-    /* Autoplay progress bar */
     .testi-progress-line {
       width:100%; height:2px; background:rgba(255,255,255,.1);
       border-radius:2px; margin-top:1.4rem; overflow:hidden;
@@ -881,13 +882,8 @@
   </nav>
 
   <!-- ═══════ HERO ═══════ -->
-  <!-- FIX: No separate .hero-bg div. Background is directly on #hero via CSS.
-       This is robust — works even if the external image is slow or fails. -->
   <section id="hero" role="banner">
-
-    <!-- Floating ambient particles (injected by JS) -->
     <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
-
     <div class="hero-body">
       <p class="hero-eyebrow">✦ Nairobi · Kenya ✦</p>
       <h1 class="hero-title">Your <em>Kenyan</em><br/>Travel Companion</h1>
@@ -897,21 +893,14 @@
         <a href="#interests" class="btn-ghost">Explore Interests</a>
       </div>
     </div>
-
     <div class="scroll-hint" aria-hidden="true">
       <div class="scroll-mouse"></div>
       <span>Scroll</span>
     </div>
-
-    <!-- Organic brush-stroke bottom edge -->
     <div class="hero-edge-wrap" aria-hidden="true">
       <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,52 C90,18 210,74 370,46 C490,24 560,72 680,50
-                 C810,26 870,70 1020,48 C1150,28 1280,66 1440,46
-                 L1440,90 L0,90 Z" fill="#FAF8F2"/>
-        <path d="M0,68 C130,44 270,80 430,60 C580,42 640,74 800,60
-                 C950,46 1060,74 1200,60 C1320,48 1390,70 1440,62
-                 L1440,90 L0,90 Z" fill="#FAF8F2" opacity="0.6"/>
+        <path d="M0,52 C90,18 210,74 370,46 C490,24 560,72 680,50 C810,26 870,70 1020,48 C1150,28 1280,66 1440,46 L1440,90 L0,90 Z" fill="#FAF8F2"/>
+        <path d="M0,68 C130,44 270,80 430,60 C580,42 640,74 800,60 C950,46 1060,74 1200,60 C1320,48 1390,70 1440,62 L1440,90 L0,90 Z" fill="#FAF8F2" opacity="0.6"/>
       </svg>
     </div>
   </section>
@@ -963,23 +952,19 @@
     </div>
     <div class="interest-grid" id="intGrid">
       <div class="int-card reveal d1" data-cat="safari">
-        <img src="https://i.postimg.cc/Hs19fbw8/africa-safaris.jpg"
-             alt="Safari — Elephants at Amboseli" loading="lazy"/>
+        <img src="https://i.postimg.cc/Hs19fbw8/africa-safaris.jpg" alt="Safari — Elephants at Amboseli" loading="lazy"/>
         <span class="int-card-label">Safari</span>
       </div>
       <div class="int-card reveal d2" data-cat="hiking">
-        <img src="https://i.postimg.cc/BZHxctrG/hiking.jpg"
-             alt="Hiking — Mount Kenya trek" loading="lazy"/>
+        <img src="https://i.postimg.cc/BZHxctrG/hiking.jpg" alt="Hiking — Mount Kenya trek" loading="lazy"/>
         <span class="int-card-label">Hiking</span>
       </div>
       <div class="int-card reveal d3" data-cat="beach">
-        <img src="https://i.postimg.cc/CMsRxDyy/beach.jpg"
-             alt="Beach — Diani coast" loading="lazy"/>
+        <img src="https://i.postimg.cc/CMsRxDyy/beach.jpg" alt="Beach — Diani coast" loading="lazy"/>
         <span class="int-card-label">Beach</span>
       </div>
       <div class="int-card reveal" data-cat="culture" style="display:none">
-        <img src="https://i.postimg.cc/SKb49TCR/culture.jpg"
-             alt="Culture — Turkana Culture" loading="lazy"/>
+        <img src="https://i.postimg.cc/SKb49TCR/culture.jpg" alt="Culture — Turkana Culture" loading="lazy"/>
         <span class="int-card-label">Culture</span>
       </div>
     </div>
@@ -993,16 +978,13 @@
       <p>Carefully curated experiences for every kind of traveller — from romantic escapes to wild family adventures.</p>
     </div>
     <div class="pkg-list">
-
-      <!-- Romantic Holiday -->
       <div class="pkg-row">
         <div class="pkg-media reveal-left">
           <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
             <path d="M105,60 C205,8 455,0 560,82 C665,164 655,392 540,465 C425,538 158,542 62,450 C-34,358 5,112 105,60 Z" fill="#E9E5D8" opacity="0.9"/>
             <path d="M140,95 C228,50 430,44 518,115 C606,186 594,368 496,430 C398,492 172,498 80,418 C-12,338 52,140 140,95 Z" fill="#DDD9CA" opacity="0.55"/>
           </svg>
-          <img src="https://i.postimg.cc/QxRgp1tC/Only-Climbers-can-feel-it.jpg"
-               alt="Romantic Mara sunset" class="pkg-photo" loading="lazy"/>
+          <img src="https://i.postimg.cc/QxRgp1tC/Only-Climbers-can-feel-it.jpg" alt="Romantic Mara sunset" class="pkg-photo" loading="lazy"/>
         </div>
         <div class="pkg-copy reveal-right">
           <p class="pkg-tag">Most Popular</p>
@@ -1018,15 +1000,13 @@
         </div>
       </div>
 
-      <!-- All For The Family -->
       <div class="pkg-row rev">
         <div class="pkg-media reveal-right">
           <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
             <path d="M92,72 C192,18 458,10 562,92 C666,174 650,385 538,460 C426,535 150,530 55,436 C-40,342 -8,126 92,72 Z" fill="#E4E0D2" opacity="0.9"/>
             <path d="M128,105 C218,58 428,52 516,122 C604,192 590,370 490,432 C390,494 162,498 70,416 C-22,334 38,152 128,105 Z" fill="#D8D4C5" opacity="0.55"/>
           </svg>
-          <img src="https://i.postimg.cc/Qt0V0GJS/Family-Favourite.jpg"
-               alt="Elephants at Amboseli" class="pkg-photo" loading="lazy"/>
+          <img src="https://i.postimg.cc/Qt0V0GJS/Family-Favourite.jpg" alt="Elephants at Amboseli" class="pkg-photo" loading="lazy"/>
         </div>
         <div class="pkg-copy reveal-left">
           <p class="pkg-tag">Family Favourite</p>
@@ -1042,15 +1022,13 @@
         </div>
       </div>
 
-      <!-- Conquer Your Fear -->
       <div class="pkg-row">
         <div class="pkg-media reveal-left">
           <svg class="blob" viewBox="0 0 660 560" xmlns="http://www.w3.org/2000/svg">
             <path d="M98,68 C198,14 462,6 566,88 C670,170 655,388 540,462 C425,536 152,532 56,438 C-40,344 -2,122 98,68 Z" fill="#E2DFCF" opacity="0.9"/>
             <path d="M132,102 C222,55 430,50 518,120 C606,190 593,368 492,430 C391,492 162,496 70,414 C-22,332 42,148 132,102 Z" fill="#D6D3C2" opacity="0.55"/>
           </svg>
-          <img src="https://i.postimg.cc/Y2vbYp31/hikes.jpg"
-               alt="Adventure in Kenya wilderness" class="pkg-photo" loading="lazy"/>
+          <img src="https://i.postimg.cc/Y2vbYp31/hikes.jpg" alt="Adventure in Kenya wilderness" class="pkg-photo" loading="lazy"/>
         </div>
         <div class="pkg-copy reveal-right">
           <p class="pkg-tag">For The Bold</p>
@@ -1065,7 +1043,6 @@
           <a href="#contact" class="btn-primary">Explore More</a>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -1092,7 +1069,6 @@
   </section>
 
   <!-- ═══════ GALLERY ═══════ -->
-  <!-- FIX: 3-column grid, item 1 spans 2 rows, item 6 spans 2 cols on row 3 -->
   <section id="gallery">
     <div class="section-head reveal">
       <h2>Kenya Through Our Lens</h2>
@@ -1100,53 +1076,42 @@
       <p>Every frame a memory. Every journey a story worth telling.</p>
     </div>
     <div class="gallery-grid">
- <div class="gal-item reveal">
-        <img src="https://i.postimg.cc/cHbKcBXM/Maasai-Mara.jpg"
-             alt="Wild Beast Migrations" loading="lazy"/>
+      <div class="gal-item reveal">
+        <img src="https://i.postimg.cc/cHbKcBXM/Maasai-Mara.jpg" alt="Wild Beast Migrations" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Maasai Mara</span></div>
       </div>
       <div class="gal-item reveal d1">
-        <img src="https://i.postimg.cc/J7jxhynZ/Amboseli-National-Park-Kenya.jpg"
-             alt="Giraffe at sunset" loading="lazy"/>
+        <img src="https://i.postimg.cc/J7jxhynZ/Amboseli-National-Park-Kenya.jpg" alt="Giraffe at sunset" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Amboseli</span></div>
       </div>
       <div class="gal-item reveal d2">
-        <img src="https://i.postimg.cc/VLC8vWMQ/Discover-the-beauty-of-Kenya-s-Maasai-heritage-colorful-traditions-strong-community-and-timele.jpg"
-             alt="Maasai culture" loading="lazy"/>
+        <img src="https://i.postimg.cc/VLC8vWMQ/Discover-the-beauty-of-Kenya-s-Maasai-heritage-colorful-traditions-strong-community-and-timele.jpg" alt="Maasai culture" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Rift Valley</span></div>
       </div>
       <div class="gal-item reveal d1">
-        <img src="https://i.postimg.cc/MHWJFCHn/evolution-of-mankind-Turkana-boy.jpg"
-             alt="Eoltution Of mankind" loading="lazy"/>
+        <img src="https://i.postimg.cc/MHWJFCHn/evolution-of-mankind-Turkana-boy.jpg" alt="Eoltution Of mankind" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Turkana</span></div>
       </div>
       <div class="gal-item reveal d1">
-        <img src="https://i.postimg.cc/zGDY7ZMs/Tropical-Paradise-at-Diani-Beach-Kenya-s-Hidden-Gem.jpg"
-             alt="Diani beach" loading="lazy"/>
+        <img src="https://i.postimg.cc/zGDY7ZMs/Tropical-Paradise-at-Diani-Beach-Kenya-s-Hidden-Gem.jpg" alt="Diani beach" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Diani Beach</span></div>
       </div>
       <div class="gal-item reveal d2">
-        <img src="https://i.postimg.cc/J00gBZh0/How-To-Travel-Through-Your-Camera-Filmmaking.jpg"
-             alt="Hot air balloon safari" loading="lazy"/>
+        <img src="https://i.postimg.cc/J00gBZh0/How-To-Travel-Through-Your-Camera-Filmmaking.jpg" alt="Hot air balloon safari" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Balloon Safari</span></div>
       </div>
       <div class="gal-item reveal d2">
-        <img src="https://i.postimg.cc/N06H8XHx/lake-victoria.jpg"
-             alt="Lake Victoria" loading="lazy"/>
+        <img src="https://i.postimg.cc/N06H8XHx/lake-victoria.jpg" alt="Lake Victoria" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Lake Victoria</span></div>
       </div>
-      <!-- Item 6: wide panoramic strip spanning cols 2–3 on row 3 -->
       <div class="gal-item reveal d3">
-        <img src="https://i.postimg.cc/Hnpj9PCh/African-Wildlife-Majestic-Lions-at-Golden-Hour.jpg"
-             alt="Mount Kenya at dawn" loading="lazy"/>
+        <img src="https://i.postimg.cc/Hnpj9PCh/African-Wildlife-Majestic-Lions-at-Golden-Hour.jpg" alt="Mount Kenya at dawn" loading="lazy"/>
         <div class="gal-overlay"><i class="fas fa-expand"></i><span>Mt. Kenya</span></div>
       </div>
     </div>
   </section>
 
   <!-- ═══════ TESTIMONIALS ═══════ -->
-  <!-- FIX: .testi-outer has overflow:visible — arrows are now visible.
-       .testi-carousel inside has overflow:hidden — slides are clipped correctly. -->
   <section id="testimonials">
     <div class="section-head reveal">
       <h2>What Travellers Say</h2>
@@ -1155,7 +1120,6 @@
     </div>
 
     <div class="testi-outer reveal">
-      <!-- Arrows OUTSIDE overflow:hidden container -->
       <button class="testi-prev" id="testiPrev" aria-label="Previous review">
         <i class="fas fa-arrow-left"></i>
       </button>
@@ -1163,10 +1127,8 @@
         <i class="fas fa-arrow-right"></i>
       </button>
 
-      <!-- Carousel track (overflow:hidden here, not on wrapper) -->
       <div class="testi-carousel">
         <div class="testi-track" id="testiTrack">
-
           <div class="testi-slide">
             <div class="testi-card">
               <span class="testi-quote-mark" aria-hidden="true">"</span>
@@ -1246,11 +1208,9 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-        </div><!-- /testi-track -->
-      </div><!-- /testi-carousel -->
-
-      <!-- Dots and progress below arrows but still in .testi-outer -->
       <div class="testi-dots" id="testiDots" role="tablist" aria-label="Testimonial navigation">
         <button class="testi-dot active" data-idx="0" role="tab" aria-label="Review 1"></button>
         <button class="testi-dot" data-idx="1" role="tab" aria-label="Review 2"></button>
@@ -1261,8 +1221,7 @@
       <div class="testi-progress-line">
         <div class="testi-progress-fill" id="testiFill"></div>
       </div>
-
-    </div><!-- /testi-outer -->
+    </div>
   </section>
 
   <!-- ═══════ CONTACT ═══════ -->
@@ -1404,9 +1363,6 @@
     </div>
   </footer>
 
-  <!-- =====================================================================
-       JAVASCRIPT — all fixes applied
-  ===================================================================== -->
   <script>
   (() => {
     'use strict';
@@ -1422,13 +1378,10 @@
 
     /* ──────────────────────────────────────────────
        2. CUSTOM CURSOR
-       FIX: only enable on true pointer (non-touch) devices.
-       Uses JS class on body instead of cursor:none on every element.
     ────────────────────────────────────────────── */
     const dot  = document.getElementById('curDot');
     const ring = document.getElementById('curRing');
 
-    // Only enable custom cursor on fine-pointer (mouse) devices
     if (window.matchMedia('(pointer:fine)').matches) {
       document.body.classList.add('has-custom-cursor');
 
@@ -1440,7 +1393,6 @@
         dot.style.top  = my + 'px';
       }, { passive: true });
 
-      // Smooth ring lag via rAF
       (function raf() {
         rx += (mx - rx) * 0.14;
         ry += (my - ry) * 0.14;
@@ -1449,7 +1401,6 @@
         requestAnimationFrame(raf);
       })();
 
-      // Expand cursor on interactive elements
       const hoverTargets = 'a, button, .chip, .int-card, .gal-item, .why-card, .pkg-photo, .testi-dot, .soc-btn';
       document.querySelectorAll(hoverTargets).forEach(el => {
         el.addEventListener('mouseenter', () => { dot.classList.add('hov'); ring.classList.add('hov'); });
@@ -1467,7 +1418,7 @@
     }, { passive: true });
 
     /* ──────────────────────────────────────────────
-       4. NAVBAR — transparent → solid on scroll
+       4. NAVBAR
     ────────────────────────────────────────────── */
     const navbar = document.getElementById('navbar');
     const onNavScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 60);
@@ -1503,7 +1454,6 @@
       hb.setAttribute('aria-expanded', 'false');
       hb.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
     }
-    // Expose closeMob globally for inline onclick
     window.closeMob = closeMob;
 
     hb.addEventListener('click', () => menuOpen ? closeMob() : openMob());
@@ -1512,13 +1462,10 @@
 
     /* ──────────────────────────────────────────────
        7. HERO PARALLAX
-       FIX: animate backgroundPositionY on #hero directly.
-       This is reliable because the image is on the element itself.
     ────────────────────────────────────────────── */
     const hero = document.getElementById('hero');
     window.addEventListener('scroll', () => {
       if (window.scrollY < window.innerHeight) {
-        // Shift the background origin downward as user scrolls
         const shift = window.scrollY * 0.35;
         hero.style.backgroundPositionY = `calc(50% + ${shift}px)`;
       }
@@ -1605,7 +1552,6 @@
 
     /* ──────────────────────────────────────────────
        12. TESTIMONIALS CAROUSEL
-       FIX: arrows now work because they're in .testi-outer (no overflow:hidden)
     ────────────────────────────────────────────── */
     const track   = document.getElementById('testiTrack');
     const fill    = document.getElementById('testiFill');
@@ -1627,7 +1573,7 @@
     function startFill() {
       fill.style.transition = 'none';
       fill.style.width = '0%';
-      void fill.offsetWidth; // force reflow
+      void fill.offsetWidth;
       fill.style.transition = `width ${DELAY}ms linear`;
       fill.style.width = '100%';
     }
@@ -1643,7 +1589,6 @@
 
     function pauseAuto() {
       clearTimeout(autoTimer);
-      // Freeze the fill at its current visual width
       const computedW = getComputedStyle(fill).width;
       fill.style.transition = 'none';
       fill.style.width = computedW;
@@ -1653,12 +1598,10 @@
     document.getElementById('testiNext').addEventListener('click', () => { goTo(current + 1); startAuto(); });
     dots.forEach(d => d.addEventListener('click', () => { goTo(parseInt(d.dataset.idx, 10)); startAuto(); }));
 
-    // Pause on hover / resume on leave
     const testiSection = document.getElementById('testimonials');
     testiSection.addEventListener('mouseenter', pauseAuto);
     testiSection.addEventListener('mouseleave', startAuto);
 
-    // Touch swipe
     let touchX = null;
     track.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
     track.addEventListener('touchend',   e => {
@@ -1668,7 +1611,6 @@
       touchX = null;
     });
 
-    // Keyboard
     testiSection.setAttribute('tabindex', '0');
     testiSection.addEventListener('keydown', e => {
       if (e.key === 'ArrowLeft')  { goTo(current - 1); startAuto(); }
